@@ -1,3 +1,4 @@
+import model.ModelInterface;
 import view.CharacterView;
 import view.GameRenderer;
 
@@ -38,7 +39,9 @@ public class Main {
                 blocks[i] = _blocks.getInt(i);
             }
 
-            GameRenderer renderer = new GameRenderer(base, blocks, height, width);
+            ModelInterface model = new ModelInterface(width, height, base, blocks);
+
+            GameRenderer renderer = new GameRenderer(base, blocks, height, width, scale);
 
             // Setup window
             JFrame frame = new JFrame("Tactical RPG");
@@ -47,6 +50,7 @@ public class Main {
 
             SpriteSheet character = new SpriteSheet("src/assets/images/characters/Soldier-Blue.png", 32, 32);
             CharacterView me = new CharacterView(character);
+            me.turnTo(6);
 
             JPanel panel = new JPanel() {
                 @Override
@@ -63,6 +67,10 @@ public class Main {
                     int x = e.getX() / (16 * scale);
                     int y = e.getY() / (16 * scale);
                     System.out.println("Tile clicked: (" + x + ", " + y + ")");
+                    boolean walkable = model.getWalkable(x, y);
+                    if (walkable){renderer.setSelectableTiles(model.getMoveableTiles(x,y));}
+                    else{System.out.println("Not walkable!");}
+                    me.turn();
                 }
             });
 
@@ -70,7 +78,7 @@ public class Main {
             frame.setVisible(true);
 
             // Redraw periodically
-            Timer timer = new Timer(500, e -> panel.repaint());
+            Timer timer = new Timer(250, e -> panel.repaint());
             timer.start();
 
         } catch (Exception e) {

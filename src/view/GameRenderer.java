@@ -8,20 +8,23 @@ public class GameRenderer {
     Central class for rendering the game.
     Draws the map, characters, overlays, and other visual elements.
     */
-    static int scale = 2;
+    private int scale;
     private int[][] baseTiles;
     private int[][] blockTiles;
     private TileAnimationGenerator tileAnimations;
     private int mapWidth;
     private int mapHeight;
     private int activeFrame;
-    public GameRenderer(int[] base, int[] blocks, int height, int width){
+    private int[][] selectableTiles;
+    public GameRenderer(int[] base, int[] blocks, int height, int width, int scale){
         try{
 
+            this.scale = scale;
             SpriteSheet terrain = new SpriteSheet("src/assets/images/tiles/punyworld-overworld-tileset.png", 16, 16);
             this.tileAnimations = new TileAnimationGenerator(terrain);
             this.mapWidth = width;
             this.mapHeight = height;
+            this.selectableTiles = new int[][] {};
             this.baseTiles = new int[mapHeight][mapWidth];
             this.blockTiles = new int[mapHeight][mapWidth];
             this.activeFrame = 0;
@@ -40,6 +43,15 @@ public class GameRenderer {
         }
     }
 
+    public void setSelectableTiles(int[][] tiles){
+        this.selectableTiles = tiles;
+    }
+
+    public void playAnimation(String todo, CharacterView person){
+        int[] action = AnimationLibrary.MY_MAP.get(todo);
+        person.setAnimation(action);
+    }
+
     public void render(Graphics g, CharacterView person) {
         for (int y = 0; y < mapHeight; y++) {
             for (int x = 0; x < mapWidth; x++) {
@@ -52,7 +64,13 @@ public class GameRenderer {
                 g.drawImage(terrainSprite, x * 16 * scale, y * 16 * scale, 16 * scale, 16 * scale, null);}
             }
         }
-        g.drawImage(person.getSprite(), person.getX() * 16 * scale, person.getY() * 16 * scale, 32 * scale, 32 * scale, null);
+        int tile_counter = 0;
+        for (int[] tile : selectableTiles){
+            g.drawImage(this.tileAnimations.getAnimation(129, 0), tile[0]*16*scale, tile[1]*16*scale, 16*scale, 16*scale, null);
+            tile_counter += 1;
+        }
+        //System.out.println("Printed a total of " + tile_counter + " tiles!");
+        g.drawImage(person.getSprite(), (person.getX() * 16 * scale) - (8*scale), (person.getY() * 16 * scale) - (8*scale), 32 * scale, 32 * scale, null);
         this.activeFrame += 1;
         if (this.activeFrame >3){this.activeFrame=0;}
     }

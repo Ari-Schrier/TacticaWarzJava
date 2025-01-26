@@ -8,13 +8,16 @@ class Map {
     private final int width, height;
     private final Tile[][] tiles;
 
-    Map(int width, int height, int[][] tile_values) {
+    Map(int width, int height, int[] tile_values, int[] blocking_values) {
         this.width = width;
         this.height = height;
         Tile[][] ArrayInProgress = new Tile[height][width];
-        for (int y = 0; y <= height; y++){
-            for (int x = 0; x <=width; x++) {
-                ArrayInProgress[y][x] = new Tile(x, y, tile_values[y][x]);
+        int i = 0;
+        for (int y = 0; y < height; y++){
+            for (int x = 0; x <width; x++) {
+                ArrayInProgress[y][x] = new Tile(x, y, tile_values[i]);
+                if (blocking_values[i]!=0){ArrayInProgress[y][x].setWalkable(false);}
+                i += 1;
             }
         }
         this.tiles = ArrayInProgress;
@@ -25,6 +28,13 @@ class Map {
             return null;
         }
         return tiles[y][x];
+    }
+
+    boolean isWalkable(int x, int y){
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+            return false;
+        }
+        return tiles[y][x].isWalkable();
     }
 
     int getWidth() {
